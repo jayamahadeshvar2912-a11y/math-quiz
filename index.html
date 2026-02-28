@@ -1,0 +1,165 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Math Quiz</title>
+    <style>
+      :root {
+        font-family: Arial, sans-serif;
+        color-scheme: light;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+        background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+      }
+      .quiz {
+        width: min(90vw, 520px);
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+        padding: 24px;
+      }
+      h1 {
+        margin-top: 0;
+        font-size: 1.8rem;
+      }
+      .question-count {
+        color: #475569;
+        margin-bottom: 12px;
+      }
+      .question {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin: 0 0 16px;
+      }
+      .answers {
+        display: grid;
+        gap: 10px;
+      }
+      button {
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 10px 12px;
+        text-align: left;
+        cursor: pointer;
+        background: #f8fafc;
+        font-size: 1rem;
+      }
+      button:hover {
+        background: #e2e8f0;
+      }
+      .feedback {
+        margin-top: 14px;
+        min-height: 1.2rem;
+        font-weight: 600;
+      }
+      .correct { color: #15803d; }
+      .incorrect { color: #b91c1c; }
+      .next, .restart {
+        margin-top: 14px;
+        width: 100%;
+        text-align: center;
+        background: #2563eb;
+        color: #fff;
+        border-color: #1d4ed8;
+      }
+      .next:hover, .restart:hover { background: #1d4ed8; }
+    </style>
+  </head>
+  <body>
+    <main class="quiz">
+      <h1>Math Quiz</h1>
+      <p class="question-count" id="question-count"></p>
+      <p class="question" id="question"></p>
+      <div class="answers" id="answers"></div>
+      <p class="feedback" id="feedback"></p>
+      <button class="next" id="next" hidden>Next Question</button>
+      <button class="restart" id="restart" hidden>Restart Quiz</button>
+    </main>
+
+    <script>
+      const quizData = [
+        { question: '6 + 7 = ?', answers: [11, 12, 13, 14], correct: 13 },
+        { question: '9 × 3 = ?', answers: [18, 21, 27, 36], correct: 27 },
+        { question: '15 - 8 = ?', answers: [5, 6, 7, 8], correct: 7 },
+        { question: '24 ÷ 6 = ?', answers: [3, 4, 5, 6], correct: 4 },
+        { question: '5² = ?', answers: [10, 15, 20, 25], correct: 25 }
+      ];
+
+      const questionCount = document.getElementById('question-count');
+      const questionEl = document.getElementById('question');
+      const answersEl = document.getElementById('answers');
+      const feedbackEl = document.getElementById('feedback');
+      const nextBtn = document.getElementById('next');
+      const restartBtn = document.getElementById('restart');
+
+      let currentIndex = 0;
+      let score = 0;
+
+      function renderQuestion() {
+        const current = quizData[currentIndex];
+        questionCount.textContent = `Question ${currentIndex + 1} of ${quizData.length}`;
+        questionEl.textContent = current.question;
+        feedbackEl.textContent = '';
+        feedbackEl.className = 'feedback';
+        nextBtn.hidden = true;
+
+        answersEl.innerHTML = '';
+        current.answers.forEach((answer) => {
+          const btn = document.createElement('button');
+          btn.textContent = answer;
+          btn.addEventListener('click', () => selectAnswer(answer));
+          answersEl.appendChild(btn);
+        });
+      }
+
+      function selectAnswer(answer) {
+        const current = quizData[currentIndex];
+        Array.from(answersEl.children).forEach((btn) => {
+          btn.disabled = true;
+        });
+
+        if (answer === current.correct) {
+          score += 1;
+          feedbackEl.textContent = '✅ Correct!';
+          feedbackEl.classList.add('correct');
+        } else {
+          feedbackEl.textContent = `❌ Not quite. The correct answer is ${current.correct}.`;
+          feedbackEl.classList.add('incorrect');
+        }
+
+        if (currentIndex < quizData.length - 1) {
+          nextBtn.hidden = false;
+        } else {
+          showFinalScore();
+        }
+      }
+
+      function showFinalScore() {
+        questionCount.textContent = 'Quiz complete!';
+        questionEl.textContent = `You scored ${score} out of ${quizData.length}.`;
+        answersEl.innerHTML = '';
+        nextBtn.hidden = true;
+        restartBtn.hidden = false;
+      }
+
+      nextBtn.addEventListener('click', () => {
+        currentIndex += 1;
+        renderQuestion();
+      });
+
+      restartBtn.addEventListener('click', () => {
+        currentIndex = 0;
+        score = 0;
+        restartBtn.hidden = true;
+        renderQuestion();
+      });
+
+      renderQuestion();
+    </script>
+  </body>
+</html>
